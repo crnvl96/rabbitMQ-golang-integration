@@ -7,7 +7,7 @@ import (
 )
 
 func OpenChannel() (*amqp.Channel, error) {
-	conn, err := amqp.Dial("amqp://guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://guest:passwd@localhost:5672/")
 	if err != nil {
 		panic(err)
 	}
@@ -21,15 +21,7 @@ func OpenChannel() (*amqp.Channel, error) {
 }
 
 func Consume(ch *amqp.Channel, out chan<- amqp.Delivery, queue string) error {
-	msgs, err := ch.Consume(
-		queue,
-		"go-consumer",
-		false,
-		false,
-		false,
-		false,
-		nil,
-	)
+	msgs, err := ch.Consume(queue, "go-consumer", false, false, false, false, nil)
 	if err != nil {
 		return err
 	}
@@ -49,10 +41,7 @@ func Publish(ch *amqp.Channel, body string, exName string) error {
 		"",
 		false,
 		false,
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(body),
-		},
+		amqp.Publishing{ContentType: "text/plain", Body: []byte(body)},
 	)
 	if err != nil {
 		return err
